@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Phonebook</title>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Phonebook</h2>
+
+        <form action="/addContact" method="get">
+            <button type="submit">Add Contact</button>
+        </form>
+
+        <ul>
+            <% contacts.forEach(contact=> { %>
+                <li>
+                    <%= contact.name %> - <%= contact.phoneNumber %>
+
+                            <form action="/edit/<%= contact.id %>" method="get" style="display: inline;">
+                                <button type="submit">Edit</button>
+                            </form>
+
+                            <form action="/delete/<%= contact.id %>" method="post" style="display: inline;">
+                                <button type="submit">Delete</button>
+                            </form>
+                </li>
+                <% }); %>
+        </ul>
+
+        <form action="/logout" method="get">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</body>
+
+</html>

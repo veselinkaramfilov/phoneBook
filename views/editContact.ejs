@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Edit Contact</title>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Edit Contact</h2>
+
+        <form action="/edit/<%= contact.id %>" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="<%= contact.name %>" required>
+
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" value="<%= contact.phoneNumber %>" required>
+
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <form action="/" method="get">
+            <button type="submit">Cancel</button>
+        </form>
+    </div>
+</body>
+
+</html>
