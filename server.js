@@ -18,6 +18,11 @@ app.use((req, res, next) => {
 
 app.disable('x-powered-by');
 
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
+
 app.listen(3000, () => {
     console.log("Server is running!");
 });
