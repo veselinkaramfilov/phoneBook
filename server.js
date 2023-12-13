@@ -24,12 +24,12 @@ app.use((req, res, next) => {
 });
 
 app.listen(3000, () => {
-    console.log("Server is running!");
+  console.log("Server is running!");
 });
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: true, cookie: {sameSite: 'strict'}}));
+app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: true, cookie: { sameSite: 'strict' } }));
 app.set('view engine', 'ejs');
 
 const db = new sqlite3.Database('./phonebook.db');
@@ -50,7 +50,7 @@ app.get('/', requireLogin, (req, res) => {
   db.all('SELECT * FROM contacts WHERE userId = ?', [req.session.userId], (err, contacts) => {
     if (err) throw err;
     res.render('phonebook', { contacts });
-    
+
   });
 });
 
@@ -61,19 +61,19 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  db.get('SELECT * FROM users WHERE username = ?' ,[username], (err, user) => {
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
     if (err) throw err;
-    
+
     if (user && bcrypt.compareSync(password, user.password)) {
       req.session.userId = user.id;
       res.redirect('/');
-    } 
-    
+    }
+
     else {
       res.redirect('/login');
     }
   });
-  
+
 });
 
 app.get('/register', (req, res) => {
@@ -136,12 +136,12 @@ app.post('/edit/:id', requireLogin, (req, res) => {
 });
 
 app.post('/delete/:id', requireLogin, (req, res) => {
-    const contactId = req.params.id;
-  
-    db.run('DELETE FROM contacts WHERE id = ? AND userId = ?', [contactId, req.session.userId], (err) => {
-      if (err) throw err;
-      res.redirect('/');
-    });
+  const contactId = req.params.id;
+
+  db.run('DELETE FROM contacts WHERE id = ? AND userId = ?', [contactId, req.session.userId], (err) => {
+    if (err) throw err;
+    res.redirect('/');
   });
+});
 
 
