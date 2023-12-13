@@ -24,7 +24,7 @@ app.listen(3000, () => {
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: true }));
+app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: true, cookie: {sameSite: 'strict'}}));
 app.set('view engine', 'ejs');
 
 
