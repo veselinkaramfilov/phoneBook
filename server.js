@@ -16,14 +16,17 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.listen(3000, () => {
     console.log("Server is running!");
 });
+
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: true }));
 app.set('view engine', 'ejs');
+
 
 const db = new sqlite3.Database('./phonebook.db');
 db.serialize(() => {
@@ -43,6 +46,7 @@ app.get('/', requireLogin, (req, res) => {
   db.all('SELECT * FROM contacts WHERE userId = ?', [req.session.userId], (err, contacts) => {
     if (err) throw err;
     res.render('phonebook', { contacts });
+    
   });
 });
 
@@ -55,14 +59,17 @@ app.post('/login', (req, res) => {
 
   db.get('SELECT * FROM users WHERE username = ?' ,[username], (err, user) => {
     if (err) throw err;
-
+    
     if (user && bcrypt.compareSync(password, user.password)) {
       req.session.userId = user.id;
       res.redirect('/');
-    } else {
+    } 
+    
+    else {
       res.redirect('/login');
     }
   });
+  
 });
 
 app.get('/register', (req, res) => {
