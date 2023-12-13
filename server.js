@@ -16,17 +16,16 @@ app.use((req, res, next) => {
   next();
 });
 
+app.disable('x-powered-by');
 
 app.listen(3000, () => {
     console.log("Server is running!");
 });
 
-
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: true, cookie: {sameSite: 'strict'}}));
 app.set('view engine', 'ejs');
-
 
 const db = new sqlite3.Database('./phonebook.db');
 db.serialize(() => {
