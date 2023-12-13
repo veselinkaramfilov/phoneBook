@@ -11,6 +11,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
+
 app.listen(3000, () => {
     console.log("Server is running!");
 });
