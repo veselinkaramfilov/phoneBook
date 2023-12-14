@@ -30,7 +30,9 @@ const requireLogin = (req, res, next) => {
 };
 
 app.get('/', requireLogin, (req, res) => {
-  db.all('SELECT * FROM contacts WHERE userId = ?', [req.session.userId], (err, contacts) => {
+  const sql = `SELECT * FROM contacts WHERE userId = ${req.session.userId}`;
+
+  db.all(sql, (err, contacts) => {
     if (err) throw err;
     res.render('phonebook', { contacts });
   });
@@ -43,7 +45,9 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  db.get('SELECT * FROM users WHERE username = ?' ,[username], (err, user) => {
+  const sql = `SELECT * FROM users WHERE username = '${username}'`;
+
+  db.get(sql, (err, user) => {
     if (err) throw err;
 
     if (user && bcrypt.compareSync(password, user.password)) {
