@@ -1,13 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
 const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 
 app.listen(3000, () => {
-    console.log("Server is running!");
+  console.log("Server is running!");
 });
 
 app.use(express.static('public'));
@@ -33,7 +32,11 @@ app.get('/', requireLogin, (req, res) => {
   const sql = `SELECT * FROM contacts WHERE userId = ${req.session.userId}`;
 
   db.all(sql, (err, contacts) => {
-    if (err) throw err;
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
     res.render('phonebook', { contacts });
   });
 });
@@ -45,12 +48,16 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  const sql = `SELECT * FROM users WHERE username = '${username}'`;
+  const sql = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
 
   db.get(sql, (err, user) => {
-    if (err) throw err;
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
 
-    if (user && bcrypt.compareSync(password, user.password)) {
+    if (user) {
       req.session.userId = user.id;
       res.redirect('/');
     } else {
@@ -66,10 +73,14 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   const { username, password } = req.body;
 
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const sql = `INSERT INTO users (username, password) VALUES ('${username}', '${password}')`;
 
-  db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err) => {
-    if (err) throw err;
+  db.run(sql, (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
 
     res.redirect('/login');
   });
@@ -88,8 +99,15 @@ app.get('/addContact', requireLogin, (req, res) => {
 app.post('/addContact', requireLogin, (req, res) => {
   const { name, phoneNumber } = req.body;
 
-  db.run('INSERT INTO contacts (userId, name, phoneNumber) VALUES (?, ?, ?)', [req.session.userId, name, phoneNumber], (err) => {
-    if (err) throw err;
+  const sql = `INSERT INTO contacts (userId, name, phoneNumber) VALUES (${req.session.userId}, '${name}', '${phoneNumber}')`;
+
+  db.run(sql, (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
     res.redirect('/');
   });
 });
@@ -97,8 +115,14 @@ app.post('/addContact', requireLogin, (req, res) => {
 app.get('/edit/:id', requireLogin, (req, res) => {
   const contactId = req.params.id;
 
-  db.get('SELECT * FROM contacts WHERE id = ? AND userId = ?', [contactId, req.session.userId], (err, contact) => {
-    if (err) throw err;
+  const sql = `SELECT * FROM contacts WHERE id = ${contactId} AND userId = ${req.session.userId}`;
+
+  db.get(sql, (err, contact) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
 
     if (contact) {
       res.render('editContact', { contact });
@@ -112,19 +136,31 @@ app.post('/edit/:id', requireLogin, (req, res) => {
   const contactId = req.params.id;
   const { name, phoneNumber } = req.body;
 
-  db.run('UPDATE contacts SET name = ?, phoneNumber = ? WHERE id = ? AND userId = ?', [name, phoneNumber, contactId, req.session.userId], (err) => {
-    if (err) throw err;
+  const sql = `UPDATE contacts SET name = '${name}', phoneNumber = '${phoneNumber}' WHERE id = ${contactId} AND userId = ${req.session.userId}`;
+
+  db.run(sql, (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
     res.redirect('/');
   });
 });
 
 app.post('/delete/:id', requireLogin, (req, res) => {
-    const contactId = req.params.id;
-  
-    db.run('DELETE FROM contacts WHERE id = ? AND userId = ?', [contactId, req.session.userId], (err) => {
-      if (err) throw err;
-      res.redirect('/');
-    });
+  const contactId = req.params.id;
+
+  const sql = `DELETE FROM contacts WHERE id = ${contactId} AND userId = ${req.session.userId}`;
+
+  db.run(sql, (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    res.redirect('/');
   });
-
-
+});
